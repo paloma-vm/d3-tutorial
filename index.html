@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <!-- Content here! -->
+  <svg id="svg" width="500" height="500">
+    <ellipse cx="250" cy="250" r="123" fill="#0ff"/>
+    <ellipse cx="300" cy="100" r="80" fill="red"/>
+    <ellipse cx="400" cy="350" r="50" fill="yellow"/> 
+  </svg>
+
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // Your script here!
+    function makeRandomData(n) {
+      const array = []
+      for (let i = 0; i < n; i += 1) {
+        array.push({ a: Math.random(), b: Math.random(), c: Math.random() })
+      }
+      return array
+    }
+
+    const data = makeRandomData(11)
+
+    // Select #svg
+    d3.select('#svg')
+      // Style #svg
+      .style('border', '1px solid #000')
+      // select all <ellipse>s in #svg
+      .selectAll('ellipse')
+      .data(data) // add some data
+      .enter() // enter the data
+      .append('ellipse')
+      // Set attributes for SVG ellipses
+      .attr('cx', (d, i) => i * 500 / data.length)
+      .attr('cy', d => d.a * 500)
+      // .attr('r', d => d.c * 50) // for circle
+      .attr('rx', d => d.b * 50) // for ellipse
+      .attr('ry', d => d.c * 50) // for ellipse
+      // .attr('fill', d => 'green')
+      .attr('fill', (d, i) => {
+        const hue = 360 * d.a
+        return `hsl(${hue}, 100%, 50%)`
+      })
+      .attr('opacity', () => 0.5)
+      // Challenges
+      .attr('stroke', (d, i) => {
+        const hue = 360 * d.b
+        return `hsl(${hue}, 100%, 50%)`
+      })
+      .attr('stroke-width', d => 10 * d.b)
+      
+
+
+  </script>
+    
+</body>
+</html>

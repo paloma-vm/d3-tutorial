@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body> 
+  <!-- Content here! -->
+
+  <!-- <div id="content"></div>  part 1 of 2 -->
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // Your script here!
+    const data = [5,6,2,8,4,9,1]
+
+    d3.select('body')
+    // d3.select('#content')  // part 2 of 2
+      .selectAll('div')
+      // .data([5,6,2,8,4,9,1])
+      .data(data)
+      .enter()
+      .append('div') // append some divs
+      // .text((d) => d)
+      .text((d) => `${(d / 10 * 100).toFixed(2)}`)
+      .style('padding', '1rem')
+      .style('margin', '1px')
+      // .style('background-color', 'red')
+      // .style('background-color', (d) => {
+      //   return d > 5 ? 'red' : 'orange'
+      // })
+      .style('border-radius', '5px')
+      .style('background-color', (d, i) => {
+        const hue = 360 / data.length * i // slices, figure out which slice to take
+        return `hsl(${hue}, 100%, 50%)`
+      })
+
+      .style('width', d => `${d /10 * 100}%`) // could say n for number, etc
+
+  </script>
+</body>
+</html>
