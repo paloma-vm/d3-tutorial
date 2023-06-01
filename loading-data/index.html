@@ -7,7 +7,7 @@
     <title>Document</title>
 </head>
 <body>
-  <svg id="svg" width="500" height="500"></svg>
+  <svg id="svg" width="800" height="500"></svg>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
@@ -16,6 +16,26 @@
     d3.csv('cities.csv')
       .then(data => {
         // console.log(data)
+        // Create a linear scale
+        const xScale = d3.scaleLinear()
+          .domain([-150, 150]) // Set the domain
+          .range([0, 800])     // Set the range
+        // create linear scale for y direction
+
+        const yScale = d3.scaleLinear()
+          .domain([-50, 50]) // using these values because the data y values go from -37 to 42
+          .range([0, 500])
+
+        // define a new ordinal scale
+        const countryScale = d3.scaleOrdinal()
+          .domain(['USA', 'Pakistan', 'Italy', 'Brazil', 'Canada'])
+          .range(['cornflowerblue', 'green', 'gold', 'tomato', 'purple'])
+        
+        const popScale = d3.scaleLinear()
+          // .domain([525010, 14910352])
+          .domain([0, 10000000])
+          .range([10, 100])
+/* --------------------------------------------------------------------- */
         d3.select('#svg')
           .style('border', '1px solid')
           .style('background-color', '#d0d2d6')
@@ -25,26 +45,14 @@
           .data(data)
           .enter()
           .append('circle')
-          .attr('cx', d => parseFloat(d.x) * 2 + 250)
+          // .attr('cx', d => parseFloat(d.x) * 2 + 250)
+          .attr('cx', d => xScale(d.x)) // scale x with xScale
           .attr('cy', d => parseFloat(d.y) * 2 + 250)
-          .attr('r', 20)
+          .attr('r', d => popScale(d.population))
           // .attr('fill', `red`)
           .attr('opacity', 0.25)
-          .attr('r', d => parseInt(d.population) * 0.00001)
-          .attr('fill', d => {
-            if (d.country === 'USA') {
-              return 'cornflowerblue'
-            } else if (d.country === 'Pakistan') {
-              return 'gold'
-            } else if (d.country === 'Italy') {
-              return 'green'
-            } else if (d.country === 'Brazil') {
-              return 'tomato'
-            } else if (d.country === "Canada") {
-              return 'purple'
-            }
-          })
-
+          .attr('fill', d => countryScale(d.country)) // using ordinal scale to set the color
+ 
       })
       
   </script>
