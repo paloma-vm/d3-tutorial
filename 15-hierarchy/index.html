@@ -73,6 +73,15 @@
           return colorScale(d.data.country)
         })
         .attr('opacity', '0.5')
+        // add text for population to each circle:
+      nodes
+        .append('text')
+        .text(d => `${num_f(d.data.population)}`)
+        .attr('font-family', 'Helvetica')
+        .style('text-anchor', 'middle')
+        .style('alignment-baseline', 'middle')
+        .style('fill', 'white')
+
 
       })
   </script>

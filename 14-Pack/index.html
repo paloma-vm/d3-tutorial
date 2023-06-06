@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <svg id="svg" width="800" height="500"></svg>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    d3.csv('../cities.csv')
+      .then(data => {
+      // Create a color scale 
+      const colorScale = d3
+        .scaleSequential(d3.interpolateViridis)
+        .domain(d3.extent(data, d => d.population))
+      // Number formatter
+      const num_f = d3.format(".2s") // adds suffix like k, M, etc
+
+      const root = d3.hierarchy({ children: data })
+        .sum(d => d.population) // Must call sum before pack()
+
+      // Pack - Create a pack function
+      const pack = d3.pack()
+        .size([500, 500]) // Set the size of the area
+        .padding(10) // define some padding between each circle
+
+      // Create a root node for d3 to draw
+      const rootNode = pack(root) // Must call sum() first! 
+      // Select the SVG element 
+      d3.select('#svg')
+        .style('border', '1px solid')
+        // Create a group for each element
+        .selectAll('g')
+        // Data is the leaves of the hierarchical root node
+        .data(rootNode.leaves())
+        .join('g') // Join your group. 
+        // Position each node using x and y 
+        .attr('transform', d => `translate(${d.x}, ${d.y})`)
+        // Add a circle to each group
+        .append('circle')
+        // Set the radius
+        .attr('r', d => d.r)
+        // Set the color of each circle
+        .attr('fill', d => {
+          // Note! d is hieracty data and the source data is on the data property!
+          return colorScale(d.data.population)
+        })
+
+        // Add a text node to each group
+        d3.select('#svg')
+          // find each group
+          .selectAll('g')
+          .data(rootNode.leaves())
+          .join('g')
+          // Add a text node
+          .append('text')
+          // Set the text
+          .text(d => num_f(d.data.population))
+          // Set the font 
+          .attr('font-family', 'Helvetica')
+          // Position the text in the center
+          .style('text-anchor', 'middle')
+          .style('alignment-baseline', 'middle')
+          .style('mix-blend-mode', 'difference')
+          .style('fill', 'white')
+
+      })
+  </script>
+</body>
+</html>
