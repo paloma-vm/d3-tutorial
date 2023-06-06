@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <svg id="svg" width="800" height="500"></svg>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    d3.csv('../cities.csv')
+      .then(data => {
+      const byCountry = {
+        label: 'world', // name: 'root'
+        children: [],
+        population: data.reduce((acc, d) => parseInt(d.population) + acc, 0)
+      }
+      const countryNames = Array.from(new Set(data.map(d => d.country)))
+      countryNames.forEach(d => {
+        const cities = data.filter(c => c.country === d)
+        const pop = cities.reduce((acc, d) => parseInt(d.population) + acc, 0)
+        byCountry.children.push({ 
+          label: d, 
+          population: pop, 
+          children: cities 
+        })
+      })
+
+      console.log(byCountry)    
+      
+      const root = d3.hierarchy(byCountry)
+
+      root
+        .sum(d => {
+        return d.population
+      }) 
+      // Must call sum before pack()
+
+      // Pack - Create a pack function
+      const pack = d3.pack()
+        .size([500, 500]) // Set the size of the area
+        .padding(2) // define some padding between each circle
+      // Create a root node for d3 to draw
+      const rootNode = pack(root) // Must call sum() first! 
+      // This adds new properties to the root data
+      console.log(rootNode)
+
+      // Number formatter
+      const num_f = d3.format(".2s")
+
+      // Create a color scale
+      const colorScale = d3
+        .scaleOrdinal(d3.schemeCategory10) // provides 10 colors
+      // Can also use a list of your own colors
+      // const colorScale = d3
+	      // .scaleOrdinal(['gold', 'tomato', 'cornflowerblue', 'green', 'chocolate', 'cadetblue', 'rebeccapurple'])
+
+      // Start drawing circles! 
+      const nodes = d3.select('#svg')
+        .selectAll('g')
+        .data(rootNode.descendants())
+        .join('g')
+        .attr('transform', d => `translate(${d.x}, ${d.y})`)
+        .append('circle')
+        .attr('r', d => d.r) // get the radius
+        .attr('fill', d => {
+          if (d.data.country === undefined) {
+            return colorScale(d.data.label)
+          }
+          return colorScale(d.data.country)
+        })
+        .attr('opacity', '0.5')
+
+      })
+  </script>
+    
+</body>
+</html>
