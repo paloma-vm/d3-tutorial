@@ -16,25 +16,39 @@
     d3.csv('cities.csv')
       .then(data => {
         // console.log(data)
+        // const minX = d3.min(data, d => parseFloat(d.x))
+        // const maxX = d3.max(data, d => parseFloat(d.x))
+        const x_extent = d3.extent(data, d => parseFloat(d.x))
+
+        // const minY = d3.min(data, d => parseFloat(d.y))
+        // const maxY = d3.max(data, d => parseFloat(d.y))
+        const y_extent = d3.extent(data, d => parseFloat(d.y))
+
+        const pop_extent = d3.extent(data, d => parseFloat(d.population))
+
+        const countries = Array.from(new Set(data.map(d => d.country)))
+
+
         // Create a linear scale
         const xScale = d3.scaleLinear()
-          .domain([-150, 150]) // Set the domain
+          .domain(x_extent) // Set the domain
           .range([0, 800])     // Set the range
-        // create linear scale for y direction
 
+        // create linear scale for y direction
         const yScale = d3.scaleLinear()
-          .domain([-50, 50]) // using these values because the data y values go from -37 to 42
-          .range([0, 500])
+          .domain(y_extent)
+          .range([100, 300])
 
         // define a new ordinal scale
         const countryScale = d3.scaleOrdinal()
-          .domain(['USA', 'Pakistan', 'Italy', 'Brazil', 'Canada'])
+          // .domain(['USA', 'Pakistan', 'Italy', 'Brazil', 'Canada'])
+          .domain(countries) // use the list of countries here
           .range(['cornflowerblue', 'green', 'gold', 'tomato', 'purple'])
         
-        const popScale = d3.scaleLinear()
+        const popScale = d3.scaleSqrt()
           // .domain([525010, 14910352])
-          .domain([0, 10000000])
-          .range([10, 100])
+          .domain(pop_extent)
+          .range([10, 200])
 /* --------------------------------------------------------------------- */
         d3.select('#svg')
           .style('border', '1px solid')
@@ -45,9 +59,9 @@
           .data(data)
           .enter()
           .append('circle')
-          // .attr('cx', d => parseFloat(d.x) * 2 + 250)
           .attr('cx', d => xScale(d.x)) // scale x with xScale
-          .attr('cy', d => parseFloat(d.y) * 2 + 250)
+          // .attr('cy', d => parseFloat(d.y) * 2 + 250)
+          .attr('cy', d => yScale(d.y)) // scale y with yScale
           .attr('r', d => popScale(d.population))
           // .attr('fill', `red`)
           .attr('opacity', 0.25)
