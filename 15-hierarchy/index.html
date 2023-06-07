@@ -13,11 +13,15 @@
   <script>
     d3.csv('../cities.csv')
       .then(data => {
-      const byCountry = {
+      const byCountry = { // root element of the hierarchy
         label: 'world', // name: 'root'
-        children: [],
-        population: data.reduce((acc, d) => parseInt(d.population) + acc, 0)
+        population: data.reduce((acc, d) => parseInt(d.population) + acc, 0),
+        children: []
       }
+      // const byCountry = {
+      //   name: 'root',
+      //   children: []
+      // }
       const countryNames = Array.from(new Set(data.map(d => d.country)))
       countryNames.forEach(d => {
         const cities = data.filter(c => c.country === d)
@@ -64,6 +68,8 @@
         .data(rootNode.descendants())
         .join('g')
         .attr('transform', d => `translate(${d.x}, ${d.y})`)
+
+      nodes
         .append('circle')
         .attr('r', d => d.r) // get the radius
         .attr('fill', d => {
@@ -72,8 +78,19 @@
           }
           return colorScale(d.data.country)
         })
-        .attr('opacity', '0.5')
-        // add text for population to each circle:
+        .attr('stroke', 'black')
+        .attr('stroke-width', '1')
+        // .attr('opacity', '0.5') // same opacity for all
+        // to make diff opacities:
+        .attr('fill-opacity', d => {
+          if (d.data.country === undefined) {
+            return 0.15 // opacity for the world and countries
+          }
+          return 0.5 // opacity for the cities
+        })
+       
+
+      // add text for population to each circle:
       nodes
         .append('text')
         .text(d => `${num_f(d.data.population)}`)
@@ -81,9 +98,33 @@
         .style('text-anchor', 'middle')
         .style('alignment-baseline', 'middle')
         .style('fill', 'white')
+        .attr('transform', `translate(0, 8)`)
+
+      // new text element to display the name
+      nodes
+        .append('text')
+        .text(d => `${d.data.label}`)
+        .attr('font-family', 'Helvetica')
+        .style('text-anchor', 'middle')
+        .style('alignment-baseline', 'middle')
+        	// set the fill color to black for country and world
+        .style('fill', d => {
+          if (d.data.country === undefined) {
+            return 'black'
+          }
+          return 'white'
+        })
+        // Offset the y by the radius for the country and world
+        .attr('transform', d => {
+          if (d.data.country === undefined) {
+            return `translate(0, -${d.r})`
+          }
+
+          return 'translate(0, -8)'
+        })
 
 
-      })
+    })
   </script>
     
 </body>
