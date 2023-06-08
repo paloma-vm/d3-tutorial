@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups</title>
+</head>
+<body>
+  <svg id="svg" width="800" height="500"></svg>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    /* Your code here! */
+    d3.csv('../cities.csv')
+      .then(data => {
+        // console.log(data)
+        // const minX = d3.min(data, d => parseFloat(d.x))
+        // const maxX = d3.max(data, d => parseFloat(d.x))
+        const x_extent = d3.extent(data, d => parseFloat(d.x))
+
+        // const minY = d3.min(data, d => parseFloat(d.y))
+        // const maxY = d3.max(data, d => parseFloat(d.y))
+        const y_extent = d3.extent(data, d => parseFloat(d.y))
+
+        const pop_extent = d3.extent(data, d => parseFloat(d.population))
+
+        const countries = Array.from(new Set(data.map(d => d.country)))
+
+
+        // Create a linear scale
+        const xScale = d3.scaleLinear()
+          .domain(x_extent) // Set the domain
+          .range([0, 800])     // Set the range
+
+        // create linear scale for y direction
+        const yScale = d3.scaleLinear()
+          .domain(y_extent)
+          .range([100, 300])
+
+        // define a new ordinal scale
+        const countryScale = d3.scaleOrdinal()
+          // .domain(['USA', 'Pakistan', 'Italy', 'Brazil', 'Canada'])
+          .domain(countries) // use the list of countries here
+          .range(['cornflowerblue', 'green', 'gold', 'tomato', 'purple'])
+        
+        const popScale = d3.scaleSqrt()
+          // .domain([525010, 14910352])
+          .domain(pop_extent)
+          .range([10, 200])
+/* --------------------------------------------------------------------- */
+  
+        const node = d3.select('#svg')
+        .style('border', '1px solid')
+        .selectAll('g') // Select all groups
+        .data(data)
+        .enter()
+        // Do not chain any more methods here!
+
+        // Append some groups
+        const groups = node
+          .append('g') // appended a group element for each piece of data
+
+        // For each of those groups 
+        // add a circle
+        groups
+          .append('circle') // nests one circle inside of each group
+          .attr('cx', d => xScale(d.x))
+          .attr('cy', d => yScale(d.y))
+          .attr('r', d => popScale(d.population))
+          .attr('fill', `red`)
+          .attr('opacity', 0.25)
+          .attr('fill', d => countryScale(d.country))
+
+        // add a text element to each group
+        groups
+          .append('text')
+          .text(d => d.label) // set the text
+          // .attr('x', d => xScale(d.x) + popScale(d.population)) // offset x by radius of the circle
+          // calculate x coordinate = x + 1.75pi * r
+          .attr('x', d => xScale(d.x) + Math.cos(Math.PI * 1.75) * popScale(d.population))
+          // .attr('y', d => yScale(d.y)) // 
+          .attr('y', d => yScale(d.y) + Math.sin(Math.PI * 1.75) * popScale(d.population))
+
+          .style('font-family', 'Helvetica')
+          .style('font-size', '18px')
+
+      })
+
+  </script>
+</body>
+</html>
