@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using Paths</title>
+    <style>
+        /* Put the box in the center of the page */
+        body, html {
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      
+        #svg {
+          border: 1px solid;
+        }
+      </style>
+</head>
+<body>
+  <svg id="svg" width="600" height="400"></svg>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    /* Your code here! */
+
+    function getDataForState(data, state) {
+      const arr = data
+        .filter(d => d.state === state)
+        .filter(d => !isNaN(d.precipitation))
+        .map(d => {
+          d.precipitation = parseFloat(d.precipitation)
+          return d
+        })
+      return arr
+    }
+
+    function handleData(data) {
+      // draw stuff here
+      console.log(getDataForState(data, 'SE'))
+      /* Creating helper functions to map the source data from domain of inches to 
+      our display domain measured in pixels */
+      const baData = getDataForState(data, 'BA')
+      // x scale 
+      const xscale = d3.scaleLinear()
+        .domain([0, baData.length]) // number of values (i.e. extents)
+        // .range([0, 600]) // width of #svg
+        .range([40, 560]) // moves the edges inward
+
+
+      const percipitationExtents = d3.extent(baData, d => d.precipitation)
+      const yscale = d3.scaleLinear()
+        .domain(percipitationExtents)
+        // .range([0, 400])
+        // .range([40, 360]) // top comes up 40, margin of 40 on bottom, values are upside down
+        // invert range by reversing the range values
+        .range([360, 40])
+
+      // line generator
+      const linegen = d3.line() // create a line generator
+        .x((d, i) => xscale(i)) // map the x to the index
+        .y(d => yscale(d.precipitation)) // map y to percipitation
+        .curve(d3.curveLinear) // apply a curve type
+
+      d3.select('#svg')
+        .append('path') // append a path
+        .attr('d', linegen(baData)) // generate a line
+        .attr('stroke-width', 3)
+        .attr('stroke', 'cornflowerblue')
+        .attr('fill', 'none')
+    }
+   
+
+
+    d3.csv('../precipitation.csv') // after D3 loads the csv data we will handle it with the handleData function
+      .then(handleData)
+
+    
+    
+  
+  </script>
+</body>
+</html>
