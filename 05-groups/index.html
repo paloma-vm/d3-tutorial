@@ -100,6 +100,21 @@
           .attr('y2', d => yScale(d.y) + (Math.sin(angle) * (popScale(d.population) + 10)))
           .attr('stroke', '#000')
 
+        // append some path elements, one to each group
+        groups
+          .append('path')
+          .attr('d', d => {
+            const x1 = xScale(d.x)
+            const y1 = yScale(d.y)
+            const x2 = xScale(d.x) + (Math.cos(angle) * (popScale(d.population) + 10))
+            const y2 = yScale(d.y) + (Math.sin(angle) * (popScale(d.population) + 10))
+            const x3 = x2 + 100
+            const y3 = y2
+            return d3.line()([[x1, y1], [x2, y2], [x3, y3]])
+          })
+          .attr('stroke', '#000')
+          .attr('fill', 'none')
+
       })
 
   </script>
