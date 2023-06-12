@@ -78,12 +78,27 @@
           .text(d => d.label) // set the text
           // .attr('x', d => xScale(d.x) + popScale(d.population)) // offset x by radius of the circle
           // calculate x coordinate = x + 1.75pi * r
-          .attr('x', d => xScale(d.x) + Math.cos(Math.PI * 1.75) * popScale(d.population))
+          .attr('x', d => xScale(d.x) + Math.cos(Math.PI * 1.75) * (popScale(d.population) + 15))
+
           // .attr('y', d => yScale(d.y)) // 
-          .attr('y', d => yScale(d.y) + Math.sin(Math.PI * 1.75) * popScale(d.population))
+          .attr('y', d => yScale(d.y) + Math.sin(Math.PI * 1.75) * (popScale(d.population) + 15))
+
 
           .style('font-family', 'Helvetica')
           .style('font-size', '18px')
+
+        // add a line element to each group that extends from the center of the circle to the text at the edge of the circle
+        // calculate the angle
+        const angle = Math.PI * 1.75
+        
+        // append some lines
+        groups
+          .append('line')
+          .attr('x1', d => xScale(d.x))
+          .attr('y1', d => yScale(d.y))
+          .attr('x2', d => xScale(d.x) + (Math.cos(angle) * (popScale(d.population) + 10)))
+          .attr('y2', d => yScale(d.y) + (Math.sin(angle) * (popScale(d.population) + 10)))
+          .attr('stroke', '#000')
 
       })
 
