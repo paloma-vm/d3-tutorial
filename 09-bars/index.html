@@ -34,7 +34,7 @@
         const yscale = d3.scaleLinear()
             .domain(popExtent)
             // .range([height, margin.top])
-            .range([margin.top, height]) // HAD TO CHANGE THIS!!!!!!!
+            .range([margin.top, height]) // HAD TO INVERT THIS!!!!!!!
 
 
         // ---------- DRAW -------------------------------
@@ -82,10 +82,6 @@
     }
 
     handleData()
-
-
-
-
   </script>
 </body>
 </html>
