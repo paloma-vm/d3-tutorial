@@ -18,13 +18,16 @@
         population: data.reduce((acc, d) => parseInt(d.population) + acc, 0),
         children: []
       }
+      console.log(byCountry)
       // const byCountry = {
       //   name: 'root',
       //   children: []
       // }
       const countryNames = Array.from(new Set(data.map(d => d.country)))
+      console.log(countryNames)
       countryNames.forEach(d => {
         const cities = data.filter(c => c.country === d)
+        console.log(cities) // array of objects
         const pop = cities.reduce((acc, d) => parseInt(d.population) + acc, 0)
         byCountry.children.push({ 
           label: d, 

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing an Axis</title>
+    <style>
+        /* Put the box in the center of the page */
+        body, html {
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      
+        #svg {
+          border: 1px solid;
+        }
+      </style>
+</head>
+<body>
+  <svg id="svg" width="600" height="300">
+
+  </svg>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    /* Your code here! */
+
+    // -------- HELPER FUNCTIONS ------------
+    function convertToArray(obj) {
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+      return months.map(month => {
+      const temp = parseFloat(obj[month])
+        return { month: month, temp }
+      }) 
+    }
+
+    async function handleData() {
+      // -------- LOAD DATA ------------
+      const data = await d3.csv('../Weather Data in India from 1901 to 2017.csv')
+      const year_1901 = data[0] // Get the first year data object
+      const months_1901 = convertToArray(year_1901) // convert to array
+      console.log(months_1901) // check your work
+
+      const width = 600
+      const height = 300
+      const margin = 40
+
+      // -------- SCALES ------------
+      const xscale = d3.scaleLinear() // use index
+        .domain([0, months_1901.length - 1])
+        .range([margin, width - margin])
+      
+      const yscale = d3.scaleLinear() // based on temperature data
+        .domain(d3.extent(months_1901, d => d.temp))
+        .range([height - margin, margin])
+
+      
+      // -------- DRAW ------------
+      // Select the SVG
+      const svg = d3
+        .select('#svg')
+
+      // Make a group for the graph
+      const graph = svg
+        .append('g')
+
+      // line generator
+      // const linegen = d3.line()
+      //   .x((d, i) => xscale(i))
+      //   .y(d => yscale(d.temp))
+        // .curve(d3.curveLinear)
+        // .curve(d3.curveStep)
+        // .curve(d3.curveStepBefore)
+        // .curve(d3.curveStepAfter)
+        // .curve(d3.curveBasis)
+        // .curve(d3.curveCardinal)
+        // .curve(d3.curveMonotoneX)
+        // .curve(d3.curveCatmullRom)
+
+
+      const linegen = d3.area() // change line to area
+        .x((d, i) => xscale(i))
+        .y0(d => yscale(d.temp)) // change y to y0
+        .y1(height - margin) // add this line
+        .curve(d3.curveBasis)
+      // Draw the graph
+      graph
+        .append('path')
+        .attr('d', linegen(months_1901))
+        // .attr('stroke-width', 1)
+        // .attr('stroke', 'cornflowerblue')
+        .attr('fill', 'rgba(255, 0, 0, 0.2)')
+
+      // -------- AXES ------------
+      const monthsScale = d3.scaleTime()
+        .domain([new Date('1901-01-01'), new Date('1901-12-01')])
+        .range([margin, width - margin])
+        .nice()
+
+      // Define the axis generators
+      const bottomAxis = d3.axisBottom(monthsScale)
+      const leftAxis = d3.axisLeft(yscale)
+      // Create the bottom axis
+      svg
+        .append('g')
+        .attr('transform', `translate(0, ${height - margin})`)
+        .call(bottomAxis)
+      // Create the left axis
+      svg
+        .append('g')
+        .attr('transform', `translate(${margin}, 0)`)
+        .call(leftAxis)
+
+
+    }
+
+    handleData()
+     
+  </script>
+</body>
+</html>
